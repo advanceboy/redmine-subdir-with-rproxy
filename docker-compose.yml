@@ -1,0 +1,24 @@
+version: "3"
+services:
+  redmine_1:
+    build: ./redmine-with-subdir
+    environment:
+      RAILS_RELATIVE_URL_ROOT: /redmine_1
+    volumes:
+      - ./redmine_1-data/sqlite:/usr/src/redmine/sqlite
+  redmine_2:
+    build: ./redmine-with-subdir
+    environment:
+      RAILS_RELATIVE_URL_ROOT: /redmine_2
+    volumes:
+      - ./redmine_2-data/sqlite:/usr/src/redmine/sqlite
+  nginx-proxy:
+    build: ./proxy
+    ports:
+      - '80'
+    environment:
+      HOST_NAME: localhost
+      NGINX_PORT: '80'
+    depends_on:
+      - redmine_1
+      - redmine_2

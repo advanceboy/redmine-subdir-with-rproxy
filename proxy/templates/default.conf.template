@@ -1,0 +1,38 @@
+server {
+    listen ${NGINX_PORT};
+    server_name ${HOST_NAME};
+
+    location / {
+        root   /usr/share/nginx/html;
+        index  index.html index.htm;
+    }
+
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+
+    location ~/redmine_1 {
+        proxy_redirect off;
+
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_hide_header Host; # Redmine throws an error when there are multiple Host headers
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        proxy_pass http://redmine_1:3000;
+    }
+
+    location ~/redmine_2 {
+        proxy_redirect off;
+
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_hide_header Host; # Redmine throws an error when there are multiple Host headers
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        proxy_pass http://redmine_2:3000;
+    }
+}
